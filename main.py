@@ -64,7 +64,7 @@ async def enviar_correo(
 
     # Enviar el correo
     try:
-        async with SMTP(hostname=SMTP_SERVER, port=SMTP_PORT, use_tls=True) as smtp:
+        async with SMTP(hostname=SMTP_SERVER, port=SMTP_PORT, start_tls=True) as smtp:
             await smtp.login(SMTP_USER, SMTP_PASS)
             await smtp.send_message(msg)
         return {"status": "success", "message": "Correo enviado correctamente"}
