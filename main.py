@@ -4,6 +4,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import formataddr
 from dotenv import load_dotenv
+from email_validator import validate_email, EmailNotValidError
 import os
 
 load_dotenv()
@@ -30,12 +31,18 @@ async def enviar_correo(
     envía un correo
     """
 
+    try:
+        valid = validate_email(correo)
+        correo_normalizado = valid.email
+    except EmailNotValidError as e:
+        return {"status": "error", "message": f"Correo inválido: {str(e)}"}
+
     # Crear el mensaje de correo
     msg = MIMEMultipart("alternative")
     msg["Subject"] = f"Nuevo contacto de {nombre}"
     msg["From"] = formataddr(("Formulario de contacto - Natzen", SMTP_USER))
     msg["To"] = DESTINATARIO
-    msg["Reply-To"] = correo
+    msg["Reply-To"] = correo_normalizado
 
     # Plantilla HTML del correo
     html_content = f"""
@@ -43,7 +50,7 @@ async def enviar_correo(
         <body style="font-family: Arial, sans-serif; color: #333;">
             <h2>Nuevo mensaje de contacto</h2>
             <p><strong>Nombre:</strong> {nombre}</p>
-            <p><strong>Correo:</strong> {correo}</p>
+            <p><strong>Correo:</strong> {correo_normalizado}</p>
             <p><strong>Teléfono:</strong> {telefono}</p>
             <p><strong>Motivo de contacto:</strong></p>
             <blockquote style="border-left: 3px solid #ccc; padding-left: 10px;">
