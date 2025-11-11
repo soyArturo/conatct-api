@@ -2,4 +2,5 @@ fastapi
 uvicorn
 aiosmtplib
 python-dotenv
+python-multipart
 email-validator
