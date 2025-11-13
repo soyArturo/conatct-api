@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Form
+from fastapi.middleware.cors import CORSMiddleware
 from email_validator import validate_email, EmailNotValidError
 from dotenv import load_dotenv
 import resend
@@ -8,6 +9,19 @@ import requests
 load_dotenv()
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",  # para desarrollo local
+    "https://natzen.mx",      # tu dominio de producción (ajústalo)
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],   # permite POST, GET, OPTIONS, etc.
+    allow_headers=["*"],   # permite todos los headers, incluidos Authorization
+)
 
 # Configuración de Resend
 resend.api_key = os.getenv("RESEND_API_KEY")
