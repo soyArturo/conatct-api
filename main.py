@@ -3,6 +3,7 @@ from email_validator import validate_email, EmailNotValidError
 from dotenv import load_dotenv
 import resend
 import os
+import requests
 
 load_dotenv()
 
@@ -11,6 +12,7 @@ app = FastAPI()
 # Configuración de Resend
 resend.api_key = os.getenv("RESEND_API_KEY")
 DESTINATARIO = os.getenv("DESTINATARIO")
+RECAPTCHA_SECRET = os.getenv("RECAPTCHA_SECRET")
 
 
 @app.post("/enviar-correo/")
@@ -18,9 +20,22 @@ async def enviar_correo(
     nombre: str = Form(...),
     correo: str = Form(...),
     telefono: str = Form(...),
-    motivo: str = Form(...)
+    motivo: str = Form(...),
+    captcha_token: str = Form(...),
 ):
     """Envía correo usando Resend API"""
+
+    recaptcha_response = requests.post(
+        "https://www.google.com/recaptcha/api/siteverify",
+        data={
+            "secret": RECAPTCHA_SECRET,
+            "response": captcha_token
+        }
+    )
+    result = recaptcha_response.json()
+
+    if not result.get("success", False):
+        return {"status": "error", "message": "CAPTCHA inválido. Intenta de nuevo."}
 
     # Validar correo
     try:
