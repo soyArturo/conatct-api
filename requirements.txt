@@ -4,3 +4,4 @@ aiosmtplib
 python-dotenv
 python-multipart
 email-validator
+resend
