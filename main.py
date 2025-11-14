@@ -2,6 +2,7 @@ from fastapi import FastAPI, Form
 from fastapi.middleware.cors import CORSMiddleware
 from email_validator import validate_email, EmailNotValidError
 from dotenv import load_dotenv
+from pydantic import BaseModel
 import resend
 import os
 import requests
@@ -29,15 +30,23 @@ DESTINATARIO = os.getenv("DESTINATARIO")
 RECAPTCHA_SECRET = os.getenv("RECAPTCHA_SECRET")
 
 
+class Contacto(BaseModel):
+    nombre: str
+    correo: str
+    telefono: str
+    motivo: str
+    captcha_token: str
+
+
 @app.post("/enviar-correo/")
-async def enviar_correo(
-    nombre: str = Form(...),
-    correo: str = Form(...),
-    telefono: str = Form(...),
-    motivo: str = Form(...),
-    captcha_token: str = Form(...),
-):
+async def enviar_correo(data: Contacto):
     """Envía correo usando Resend API"""
+
+    nombre = data.nombre
+    correo = data.correo
+    telefono = data.telefono
+    motivo = data.motivo
+    captcha_token = data.captcha_token
 
     recaptcha_response = requests.post(
         "https://www.google.com/recaptcha/api/siteverify",
