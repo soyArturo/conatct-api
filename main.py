@@ -12,8 +12,9 @@ load_dotenv()
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",  # para desarrollo local
-    "https://natzen.mx",      # tu dominio de producción (ajústalo)
+    "http://localhost:5173",
+    "https://natzen.mx",
+    "https://natzen.vercel.app"
 ]
 
 app.add_middleware(
